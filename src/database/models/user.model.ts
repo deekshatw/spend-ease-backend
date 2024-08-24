@@ -2,6 +2,11 @@ import mongoose, { Schema } from "mongoose";
 import { UserInterface } from "../interfaces/user.interface";
 
 const userSchema = new Schema<UserInterface>({
+    userId: {
+        type: Number,
+        required: true,
+        unique: true
+    },
     name: {
         type: String,
         required: true

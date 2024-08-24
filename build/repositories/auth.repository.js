@@ -12,11 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUserRepository = void 0;
+exports.loginUserRepository = exports.createUserRepository = void 0;
+const counter_service_1 = require("../database/models/helpers/counter.service");
 const user_model_1 = __importDefault(require("../database/models/user.model"));
-const createUserRepository = (user) => __awaiter(void 0, void 0, void 0, function* () {
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const createUserRepository = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, email, password } = userData;
+    const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
     try {
-        const created = yield user_model_1.default.create(user);
+        const userId = yield (0, counter_service_1.getNextUserId)();
+        const created = yield user_model_1.default.create({
+            userId,
+            name,
+            email,
+            password: hashedPassword
+        });
         return created ? true : false;
     }
     catch (error) {
@@ -24,3 +34,17 @@ const createUserRepository = (user) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createUserRepository = createUserRepository;
+const loginUserRepository = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield user_model_1.default.findOne({ email });
+        if (!user) {
+            return null;
+        }
+        const isMatch = yield bcryptjs_1.default.compare(password, user.password);
+        return isMatch ? user : null;
+    }
+    catch (error) {
+        return null;
+    }
+});
+exports.loginUserRepository = loginUserRepository;
