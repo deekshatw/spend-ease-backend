@@ -4,26 +4,34 @@ import userModel from "../database/models/user.model";
 import bcrypt from "bcryptjs";
 
 
-export const createUserRepository = async (userData: Omit<UserInterface, 'createdAt'>): Promise<boolean> => {
+export const createUserRepository = async (userData: Omit<UserInterface, 'createdAt'>): Promise<string> => {
     const { name, email, password } = userData;
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
     try {
 
-        const userId = await getNextUserId();
 
-        const created = await userModel.create(
-            {
-                userId,
-                name,
-                email,
-                password: hashedPassword
-            }
-        );
-        return created ? true : false;
+        const isAlreadyExists = await userModel.findOne({ email });
+
+        if (isAlreadyExists) {
+            return 'exists';
+
+        } else {
+            const userId = await getNextUserId();
+
+            const created = await userModel.create(
+                {
+                    userId,
+                    name,
+                    email,
+                    password: hashedPassword
+                }
+            );
+            return created ? 'success' : 'error';
+        }
     } catch (error) {
-        return false;
+        return "error";
     }
 };
 

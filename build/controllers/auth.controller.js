@@ -16,10 +16,10 @@ const createUserController = (req, res) => __awaiter(void 0, void 0, void 0, fun
     const body = req.body;
     try {
         const user = yield (0, auth_repository_1.createUserRepository)(body);
-        if (user) {
-            res.status(200).json({
-                "success": true,
-                "message": "User created successfully"
+        if (user === 'exists') {
+            res.status(409).json({
+                "success": false,
+                "message": "This email is already in use!"
             });
         }
         else {
