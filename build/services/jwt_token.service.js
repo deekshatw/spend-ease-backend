@@ -10,6 +10,6 @@ const generateJwtToken = (user) => {
     if (!JWT_SECRET) {
         throw new Error("JWT_SECRET not found");
     }
-    return jsonwebtoken_1.default.sign({ userId: user.userId, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    return jsonwebtoken_1.default.sign({ userId: user.userId, email: user.email }, JWT_SECRET);
 };
 exports.generateJwtToken = generateJwtToken;
