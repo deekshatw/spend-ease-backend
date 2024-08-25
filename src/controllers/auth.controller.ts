@@ -6,12 +6,18 @@ export const createUserController = async (req: Request, res: Response) => {
     const body = req.body;
     try {
         const user = await createUserRepository(body);
-        if (user) {
-            res.status(200).json({
+        if (user === 'exists') {
+            res.status(409).json({
+                "success": false,
+                "message": "This email is already in use!"
+            });
+        } else if (user === 'success') {
+            res.status(201).json({
                 "success": true,
                 "message": "User created successfully"
             });
-        } else {
+        }
+        else {
             res.status(500).json({
                 "success": false,
                 "message": "Internal server error"
@@ -38,12 +44,11 @@ export const loginUserController = async (req: Request, res: Response) => {
                 "success": true,
                 "message": "User logged in successfully",
                 "user": {
-                    "token": token,
                     "userId": user.userId,
+                    "token": token,
                     "name": user.name,
                     "email": user.email,
                     "createdAt": user.createdAt,
-
                 }
             });
         } else {

@@ -16,8 +16,14 @@ const createUserController = (req, res) => __awaiter(void 0, void 0, void 0, fun
     const body = req.body;
     try {
         const user = yield (0, auth_repository_1.createUserRepository)(body);
-        if (user) {
-            res.status(200).json({
+        if (user === 'exists') {
+            res.status(409).json({
+                "success": false,
+                "message": "This email is already in use!"
+            });
+        }
+        else if (user === 'success') {
+            res.status(201).json({
                 "success": true,
                 "message": "User created successfully"
             });
@@ -48,8 +54,8 @@ const loginUserController = (req, res) => __awaiter(void 0, void 0, void 0, func
                 "success": true,
                 "message": "User logged in successfully",
                 "user": {
-                    "token": token,
                     "userId": user.userId,
+                    "token": token,
                     "name": user.name,
                     "email": user.email,
                     "createdAt": user.createdAt,

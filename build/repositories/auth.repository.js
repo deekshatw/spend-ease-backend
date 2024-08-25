@@ -20,17 +20,23 @@ const createUserRepository = (userData) => __awaiter(void 0, void 0, void 0, fun
     const { name, email, password } = userData;
     const hashedPassword = yield bcryptjs_1.default.hash(password, 12);
     try {
-        const userId = yield (0, counter_service_1.getNextUserId)();
-        const created = yield user_model_1.default.create({
-            userId,
-            name,
-            email,
-            password: hashedPassword
-        });
-        return created ? true : false;
+        const isAlreadyExists = yield user_model_1.default.findOne({ email });
+        if (isAlreadyExists) {
+            return 'exists';
+        }
+        else {
+            const userId = yield (0, counter_service_1.getNextUserId)();
+            const created = yield user_model_1.default.create({
+                userId,
+                name,
+                email,
+                password: hashedPassword
+            });
+            return created ? 'success' : 'error';
+        }
     }
     catch (error) {
-        return false;
+        return "error";
     }
 });
 exports.createUserRepository = createUserRepository;
