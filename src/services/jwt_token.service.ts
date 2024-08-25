@@ -7,5 +7,5 @@ export const generateJwtToken = (user: UserInterface): string => {
     if (!JWT_SECRET) {
         throw new Error("JWT_SECRET not found");
     }
-    return jwt.sign({ userId: user.userId, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ userId: user.userId, email: user.email }, JWT_SECRET);
 };

@@ -12,10 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNextExpenseId = exports.getNextCategoryId = exports.getNextUserId = void 0;
+exports.getNextIncomeId = exports.getNextExpenseId = exports.getNextCategoryId = exports.getNextUserId = void 0;
 const category_counter_schema_1 = __importDefault(require("./category_counter.schema"));
 const counter_schema_1 = __importDefault(require("./counter.schema"));
 const expense_counter_schema_1 = __importDefault(require("./expense_counter.schema"));
+const income_counter_schema_1 = __importDefault(require("./income_counter.schema"));
 const getNextUserId = () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const sequenceDocument = yield counter_schema_1.default.findByIdAndUpdate({ _id: 'userId' }, { $inc: { sequence_value: 1 } }, { new: true, upsert: true });
@@ -39,3 +40,12 @@ const getNextExpenseId = () => __awaiter(void 0, void 0, void 0, function* () {
     return formattedExpenseId;
 });
 exports.getNextExpenseId = getNextExpenseId;
+const getNextIncomeId = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const sequenceDocument = yield income_counter_schema_1.default.findByIdAndUpdate({ _id: 'incomeId' }, { $inc: { sequence_value: 1 } }, { new: true, upsert: true });
+    const sequenceValue = (_a = sequenceDocument.sequence_value) !== null && _a !== void 0 ? _a : 1;
+    const formattedIncomeId = `I-${sequenceValue.toString().padStart(2, '0')}`;
+    console.log(formattedIncomeId);
+    return formattedIncomeId;
+});
+exports.getNextIncomeId = getNextIncomeId;
