@@ -22,6 +22,12 @@ const createUserController = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 "message": "This email is already in use!"
             });
         }
+        else if (user === 'success') {
+            res.status(201).json({
+                "success": true,
+                "message": "User created successfully"
+            });
+        }
         else {
             res.status(500).json({
                 "success": false,
@@ -48,8 +54,8 @@ const loginUserController = (req, res) => __awaiter(void 0, void 0, void 0, func
                 "success": true,
                 "message": "User logged in successfully",
                 "user": {
-                    "token": token,
                     "userId": user.userId,
+                    "token": token,
                     "name": user.name,
                     "email": user.email,
                     "createdAt": user.createdAt,
