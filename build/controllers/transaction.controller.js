@@ -9,18 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllExpensesOfOneUserController = exports.createExpenseController = void 0;
-const expense_repository_1 = require("../repositories/expense.repository");
-const createExpenseController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const expense = req.body;
-    console.log(expense);
+exports.getAllTransactionsOfOneUserController = exports.createTransactionController = void 0;
+const transaction_repository_1 = require("../repositories/transaction.repository");
+const createTransactionController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const transaction = req.body;
+    console.log(transaction);
     try {
-        const response = yield (0, expense_repository_1.createExpenseRepository)(expense);
+        const response = yield (0, transaction_repository_1.createTransactionRepository)(transaction);
         console.log(response);
         if (response === 'success') {
             res.status(201).json({
                 "success": true,
-                "message": "Expense created successfully"
+                "message": "Transaction created successfully"
             });
         }
         else {
@@ -38,28 +38,25 @@ const createExpenseController = (req, res) => __awaiter(void 0, void 0, void 0, 
         });
     }
 });
-exports.createExpenseController = createExpenseController;
-const getAllExpensesOfOneUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createTransactionController = createTransactionController;
+const getAllTransactionsOfOneUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
     console.log(userId);
     if (!userId) {
         res.status(400).json({ success: false, message: "User ID not found" });
     }
+    const { startDate, endDate, type } = req.query;
+    const filters = {
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined,
+        type: type
+    };
     try {
-        const expenses = yield (0, expense_repository_1.getAllExpensesOfOneUserRepository)(userId);
+        const transactions = yield (0, transaction_repository_1.getAllTransactionsOfOneUserRepository)(userId, filters);
         res.status(200).json({
             "success": true,
-            "data": expenses.map(expense => {
-                return {
-                    "expenseId": expense.expenseId,
-                    "amount": expense.amount,
-                    "description": expense.description,
-                    "date": expense.date,
-                    "userId": expense.userId,
-                    "categoryId": expense.categoryId
-                };
-            })
+            "data": transactions
         });
     }
     catch (error) {
@@ -70,4 +67,4 @@ const getAllExpensesOfOneUserController = (req, res) => __awaiter(void 0, void 0
         });
     }
 });
-exports.getAllExpensesOfOneUserController = getAllExpensesOfOneUserController;
+exports.getAllTransactionsOfOneUserController = getAllTransactionsOfOneUserController;

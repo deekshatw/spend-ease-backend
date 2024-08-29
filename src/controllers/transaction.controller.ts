@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import { createIncomeRepository, getAllIncomesOfOneUserRepository } from "../repositories/income.repository";
+import { createTransactionRepository, getAllTransactionsOfOneUserRepository } from "../repositories/transaction.repository";
 
-export const createIncomeController = async (req: Request, res: Response) => {
-    const income = req.body;
-    console.log(income);
+export const createTransactionController = async (req: Request, res: Response) => {
+    const transaction = req.body;
+    console.log(transaction);
     try {
-        const response = await createIncomeRepository(income);
+        const response = await createTransactionRepository(transaction);
         console.log(response);
         if (response === 'success') {
             res.status(201).json({
                 "success": true,
-                "message": "Income created successfully"
+                "message": "Transaction created successfully"
             });
         } else {
             res.status(500).json({
@@ -27,26 +27,25 @@ export const createIncomeController = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllIncomesOfOneUserController = async (req: Request, res: Response): Promise<void> => {
+export const getAllTransactionsOfOneUserController = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.userId;
     console.log(userId);
     if (!userId) {
         res.status(400).json({ success: false, message: "User ID not found" });
     }
+
+    const { startDate, endDate, type } = req.query;
+    const filters = {
+        startDate: startDate ? new Date(startDate as string) : undefined,
+        endDate: endDate ? new Date(endDate as string) : undefined,
+        type: type as 'income' | 'expense'
+    };
+
     try {
-        const incomes = await getAllIncomesOfOneUserRepository(userId!);
+        const transactions = await getAllTransactionsOfOneUserRepository(userId!, filters);
         res.status(200).json({
             "success": true,
-            "data": incomes.map(income => {
-                return {
-                    "incomeId": income.incomeId,
-                    "amount": income.amount,
-                    "description": income.description,
-                    "date": income.date,
-                    "userId": income.userId,
-                    "categoryId": income.categoryId
-                }
-            })
+            "data": transactions
         });
     } catch (error) {
         console.error(error);
