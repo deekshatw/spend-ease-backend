@@ -7,6 +7,10 @@ const transactionSchema = new Schema<TransactionInterface>({
         required: true,
         unique: true
     },
+    title: {
+        type: String,
+        required: true
+    },
     amount: {
         type: Number,
         required: true

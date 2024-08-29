@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllTransactionsOfOneUserController = exports.createTransactionController = void 0;
+exports.getTransactionSummaryController = exports.getAllTransactionsOfOneUserController = exports.createTransactionController = void 0;
 const transaction_repository_1 = require("../repositories/transaction.repository");
 const createTransactionController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const transaction = req.body;
@@ -68,3 +68,26 @@ const getAllTransactionsOfOneUserController = (req, res) => __awaiter(void 0, vo
     }
 });
 exports.getAllTransactionsOfOneUserController = getAllTransactionsOfOneUserController;
+const getTransactionSummaryController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!userId) {
+        res.status(400).json({ success: false, message: "User ID not found" });
+        return;
+    }
+    try {
+        const summary = yield (0, transaction_repository_1.getUserTransactionSummaryRepository)(userId.toString());
+        res.status(200).json({
+            success: true,
+            data: summary
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching transaction summary'
+        });
+    }
+});
+exports.getTransactionSummaryController = getTransactionSummaryController;

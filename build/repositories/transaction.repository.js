@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllTransactionsOfOneUserRepository = exports.createTransactionRepository = void 0;
+exports.getUserTransactionSummaryRepository = exports.getAllTransactionsOfOneUserRepository = exports.createTransactionRepository = void 0;
 const category_model_1 = __importDefault(require("../database/models/category.model"));
 const counter_service_1 = require("../database/models/helpers/counter.service");
 const transaction_model_1 = __importDefault(require("../database/models/transaction.model"));
@@ -22,6 +22,7 @@ const createTransactionRepository = (transaction) => __awaiter(void 0, void 0, v
         const created = yield transaction_model_1.default.create({
             transactionId: transactionId,
             amount: transaction.amount,
+            title: transaction.title,
             description: transaction.description,
             date: transaction.date,
             userId: transaction.userId,
@@ -53,14 +54,14 @@ const getAllTransactionsOfOneUserRepository = (userId_1, ...args_1) => __awaiter
             query.transactionType = filters.type;
         }
         // Find all transactions based on the query
-        const transactions = yield transaction_model_1.default.find(query).sort({ date: -1 }).exec();
-        console.log("Unsorted transactions:", transactions);
+        const transactions = yield transaction_model_1.default.find(query).sort({ date: -1, createdAt: -1 }).exec();
         // For each transaction, fetch the associated category
         const result = yield Promise.all(transactions.map((transaction) => __awaiter(void 0, void 0, void 0, function* () {
             const category = yield category_model_1.default.findOne({ categoryId: transaction.categoryId }).exec();
             return {
                 transactionId: transaction.transactionId,
                 amount: transaction.amount,
+                title: transaction.title,
                 description: transaction.description,
                 date: transaction.date,
                 userId: transaction.userId,
@@ -80,3 +81,49 @@ const getAllTransactionsOfOneUserRepository = (userId_1, ...args_1) => __awaiter
     }
 });
 exports.getAllTransactionsOfOneUserRepository = getAllTransactionsOfOneUserRepository;
+const getUserTransactionSummaryRepository = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(`Fetching transaction summary for user ID: ${userId}`);
+        // Aggregation pipeline to calculate income, expense, and balance
+        const result = yield transaction_model_1.default.aggregate([
+            { $match: { userId: userId } },
+            {
+                $group: {
+                    _id: null,
+                    totalIncome: {
+                        $sum: {
+                            $cond: [{ $eq: ["$transactionType", "income"] }, "$amount", 0]
+                        }
+                    },
+                    totalExpense: {
+                        $sum: {
+                            $cond: [{ $eq: ["$transactionType", "expense"] }, "$amount", 0]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    income: "$totalIncome",
+                    expense: "$totalExpense",
+                    balance: { $subtract: ["$totalIncome", "$totalExpense"] }
+                }
+            }
+        ]);
+        console.log('Aggregation result:', result);
+        if (result.length > 0) {
+            const summary = result[0];
+            console.log(`Total Income: ${summary.income}, Total Expense: ${summary.expense}, Balance: ${summary.balance}`);
+            return summary;
+        }
+        else {
+            return { income: 0, expense: 0, balance: 0 };
+        }
+    }
+    catch (error) {
+        console.error('Error fetching transaction summary:', error);
+        return { income: 0, expense: 0, balance: 0 };
+    }
+});
+exports.getUserTransactionSummaryRepository = getUserTransactionSummaryRepository;
