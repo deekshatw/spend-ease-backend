@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createTransactionRepository, getAllTransactionsOfOneUserRepository } from "../repositories/transaction.repository";
+import { createTransactionRepository, getAllTransactionsOfOneUserRepository, getUserTransactionSummaryRepository } from "../repositories/transaction.repository";
 
 export const createTransactionController = async (req: Request, res: Response) => {
     const transaction = req.body;
@@ -55,3 +55,27 @@ export const getAllTransactionsOfOneUserController = async (req: Request, res: R
         });
     }
 };
+
+export const getTransactionSummaryController = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+        res.status(400).json({ success: false, message: "User ID not found" });
+        return;
+    }
+
+    try {
+        const summary = await getUserTransactionSummaryRepository(userId.toString());
+        res.status(200).json({
+            success: true,
+            data: summary
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching transaction summary'
+        });
+    }
+};
+

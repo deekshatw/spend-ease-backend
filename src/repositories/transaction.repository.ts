@@ -8,6 +8,7 @@ export const createTransactionRepository = async (transaction: TransactionInterf
         const created = await TransactionModel.create({
             transactionId: transactionId,
             amount: transaction.amount,
+            title: transaction.title,
             description: transaction.description,
             date: transaction.date,
             userId: transaction.userId,
@@ -25,7 +26,7 @@ export const createTransactionRepository = async (transaction: TransactionInterf
 export const getAllTransactionsOfOneUserRepository = async (
     userId: number,
     filters: FilterOptions = {}
-): Promise<any[]> => {  // Return any[] to accommodate mixed transaction and category data
+): Promise<any[]> => {
     try {
         const query: any = { userId };
         if (filters.startDate || filters.endDate) {
@@ -42,8 +43,7 @@ export const getAllTransactionsOfOneUserRepository = async (
         }
 
         // Find all transactions based on the query
-        const transactions = await TransactionModel.find(query).sort({ date: -1 }).exec();
-        console.log("Unsorted transactions:", transactions);
+        const transactions = await TransactionModel.find(query).sort({ date: -1, createdAt: -1 }).exec();
 
         // For each transaction, fetch the associated category
         const result = await Promise.all(transactions.map(async (transaction) => {
@@ -51,6 +51,7 @@ export const getAllTransactionsOfOneUserRepository = async (
             return {
                 transactionId: transaction.transactionId,
                 amount: transaction.amount,
+                title: transaction.title,
                 description: transaction.description,
                 date: transaction.date,
                 userId: transaction.userId,
@@ -69,6 +70,47 @@ export const getAllTransactionsOfOneUserRepository = async (
         return [];
     }
 };
+
+export const getUserTransactionSummaryRepository = async (userId: string): Promise<{ income: number, expense: number, balance: number }> => {
+    try {
+        const result = await TransactionModel.aggregate([
+            { $match: { userId: userId } },
+            {
+                $group: {
+                    _id: null,
+                    totalIncome: {
+                        $sum: {
+                            $cond: [{ $eq: ["$transactionType", "income"] }, "$amount", 0]
+                        }
+                    },
+                    totalExpense: {
+                        $sum: {
+                            $cond: [{ $eq: ["$transactionType", "expense"] }, "$amount", 0]
+                        }
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    income: "$totalIncome",
+                    expense: "$totalExpense",
+                    balance: { $subtract: ["$totalIncome", "$totalExpense"] }
+                }
+            }
+        ]);
+
+        if (result.length > 0) {
+            const summary = result[0];
+            return summary;
+        } else {
+            return { income: 0, expense: 0, balance: 0 };
+        }
+    } catch (error) {
+        return { income: 0, expense: 0, balance: 0 };
+    }
+};
+
 
 
 interface FilterOptions {
