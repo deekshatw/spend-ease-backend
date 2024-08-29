@@ -1,7 +1,6 @@
 import CategoryCounter from "./category_counter.schema";
 import UserCounter from "./counter.schema";
-import ExpenseCounter from "./expense_counter.schema";
-import IncomeCounter from "./income_counter.schema";
+import TransactionCounter from "./transaction_counter.schema";
 
 export const getNextUserId = async (): Promise<number> => {
     const sequenceDocument = await UserCounter.findByIdAndUpdate(
@@ -23,26 +22,15 @@ export const getNextCategoryId = async (): Promise<string> => {
     return formattedCategoryId;
 };
 
-export const getNextExpenseId = async (): Promise<string> => {
-    const sequenceDocument = await ExpenseCounter.findByIdAndUpdate(
-        { _id: 'expenseId' },
-        { $inc: { sequence_value: 1 } },
-        { new: true, upsert: true }
-    );
-    const sequenceValue = sequenceDocument.sequence_value ?? 1;
-    const formattedExpenseId = `E-${sequenceValue.toString().padStart(2, '0')}`;
-    console.log(formattedExpenseId);
-    return formattedExpenseId;
-};
 
-export const getNextIncomeId = async (): Promise<string> => {
-    const sequenceDocument = await IncomeCounter.findByIdAndUpdate(
-        { _id: 'incomeId' },
+export const getNextTransactionId = async (): Promise<string> => {
+    const sequenceDocument = await TransactionCounter.findByIdAndUpdate(
+        { _id: 'transactionId' },
         { $inc: { sequence_value: 1 } },
         { new: true, upsert: true }
     );
     const sequenceValue = sequenceDocument.sequence_value ?? 1;
-    const formattedIncomeId = `I-${sequenceValue.toString().padStart(2, '0')}`;
-    console.log(formattedIncomeId);
-    return formattedIncomeId;
+    const formattedTransactionId = `T-${sequenceValue.toString().padStart(2, '0')}`;
+    console.log(formattedTransactionId);
+    return formattedTransactionId;
 };

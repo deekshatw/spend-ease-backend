@@ -24,8 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const expenseSchema = new mongoose_1.Schema({
-    expenseId: {
+const transactionSchema = new mongoose_1.Schema({
+    transactionId: {
         type: String,
         required: true,
         unique: true
@@ -37,7 +37,12 @@ const expenseSchema = new mongoose_1.Schema({
     description: {
         type: String,
         required: false,
-        default: "Expense description"
+        default: "Transaction description"
+    },
+    transactionType: {
+        enum: ['income', 'expense'],
+        type: String,
+        required: true
     },
     date: {
         type: Date,
@@ -58,5 +63,5 @@ const expenseSchema = new mongoose_1.Schema({
         default: Date.now
     }
 });
-const ExpenseModel = mongoose_1.default.model('ExpenseModel', expenseSchema);
-exports.default = ExpenseModel;
+const TransactionModel = mongoose_1.default.model('TransactionModel', transactionSchema);
+exports.default = TransactionModel;

@@ -23,6 +23,6 @@ const categorySchema = new Schema<CategoryInterface>({
 });
 
 
-const categoryModel = mongoose.model<CategoryInterface>('CategoryModel', categorySchema);
+const CategoryModel = mongoose.model<CategoryInterface>('CategoryModel', categorySchema);
 
-export default categoryModel;
+export default CategoryModel;

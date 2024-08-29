@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
-import { ExpenseInterface } from "../interfaces/expense.interface";
+import { TransactionInterface } from "../interfaces/transaction.interface";
 
-const expenseSchema = new Schema<ExpenseInterface>({
-    expenseId: {
+const transactionSchema = new Schema<TransactionInterface>({
+    transactionId: {
         type: String,
         required: true,
         unique: true
@@ -14,7 +14,12 @@ const expenseSchema = new Schema<ExpenseInterface>({
     description: {
         type: String,
         required: false,
-        default: "Expense description"
+        default: "Transaction description"
+    },
+    transactionType: {
+        enum: ['income', 'expense'],
+        type: String,
+        required: true
     },
     date: {
         type: Date,
@@ -36,5 +41,5 @@ const expenseSchema = new Schema<ExpenseInterface>({
     }
 });
 
-const ExpenseModel = mongoose.model<ExpenseInterface>('ExpenseModel', expenseSchema);
-export default ExpenseModel;
+const TransactionModel = mongoose.model<TransactionInterface>('TransactionModel', transactionSchema);
+export default TransactionModel;

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const expenseCounterSchema = new mongoose_1.Schema({
+const transactionCounterSchema = new mongoose_1.Schema({
     _id: {
         type: String,
         required: true
@@ -11,5 +11,5 @@ const expenseCounterSchema = new mongoose_1.Schema({
         required: true
     }
 });
-const ExpenseCounter = (0, mongoose_1.model)("ExpenseCounter", expenseCounterSchema);
-exports.default = ExpenseCounter;
+const TransactionCounter = (0, mongoose_1.model)("TransactionCounter", transactionCounterSchema);
+exports.default = TransactionCounter;

@@ -1,11 +1,11 @@
 import { CategoryInterface } from "../database/interfaces/category.interface";
-import categoryModel from "../database/models/category.model";
+import CategoryModel from "../database/models/category.model";
 import { getNextCategoryId } from "../database/models/helpers/counter.service";
 
 export const createCategoryRepository = async (category: CategoryInterface): Promise<string> => {
     try {
 
-        const isAlreadyExists = await categoryModel.findOne({ name: category.name });
+        const isAlreadyExists = await CategoryModel.findOne({ name: category.name });
 
         if (isAlreadyExists) {
             return 'exists';
@@ -13,7 +13,7 @@ export const createCategoryRepository = async (category: CategoryInterface): Pro
         } else {
             const categoryId = await getNextCategoryId();
 
-            const created = await categoryModel.create(
+            const created = await CategoryModel.create(
                 {
                     categoryId,
                     name: category.name,
@@ -32,7 +32,7 @@ export const createCategoryRepository = async (category: CategoryInterface): Pro
 export const getCategoriesListRepository = async (): Promise<CategoryInterface[]> => {
     try {
 
-        const categories = await categoryModel.find({});
+        const categories = await CategoryModel.find({});
 
         return categories;
 

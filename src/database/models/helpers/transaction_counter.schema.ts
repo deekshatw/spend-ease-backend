@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const incomeCounterSchema = new Schema({
+const transactionCounterSchema = new Schema({
     _id: {
         type: String,
         required: true
@@ -11,6 +11,6 @@ const incomeCounterSchema = new Schema({
     }
 });
 
-const IncomeCounter = model("IncomeCounter", incomeCounterSchema);
+const TransactionCounter = model("TransactionCounter", transactionCounterSchema);
 
-export default IncomeCounter;
+export default TransactionCounter;

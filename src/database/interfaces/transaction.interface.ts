@@ -1,9 +1,10 @@
 import { Document } from "mongoose";
 
-export interface IncomeInterface extends Document {
-    incomeId: string;
+export interface TransactionInterface extends Document {
+    transactionId: string;
     amount: number;
     description: string;
+    transactionType: 'income' | 'expense';
     date: Date;
     userId: string;
     categoryId: string;
