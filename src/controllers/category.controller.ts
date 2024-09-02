@@ -21,7 +21,7 @@ export const createCategoryController = async (req: Request, res: Response) => {
         else {
             res.status(500).json({
                 "success": false,
-                "message": "Internal server error"
+                "message": `Internal server error: ${response}`
             });
         }
     } catch (error) {

@@ -15,7 +15,6 @@ export const createTransactionRepository = async (transaction: TransactionInterf
             categoryId: transaction.categoryId,
             transactionType: transaction.transactionType
         });
-        console.log(created);
         return created ? 'success' : 'error';
     } catch (error) {
         console.error(error);
@@ -42,10 +41,8 @@ export const getAllTransactionsOfOneUserRepository = async (
             query.transactionType = filters.type;
         }
 
-        // Find all transactions based on the query
         const transactions = await TransactionModel.find(query).sort({ date: -1, createdAt: -1 }).exec();
 
-        // For each transaction, fetch the associated category
         const result = await Promise.all(transactions.map(async (transaction) => {
             const category = await CategoryModel.findOne({ categoryId: transaction.categoryId }).exec();
             return {
@@ -54,12 +51,12 @@ export const getAllTransactionsOfOneUserRepository = async (
                 title: transaction.title,
                 description: transaction.description,
                 date: transaction.date,
-                userId: transaction.userId,
+                // userId: transaction.userId,
                 category: category ? {
                     categoryId: category.categoryId,
                     name: category.name,
                     description: category.description
-                } : null,  // Handle case where the category is not found
+                } : null,
                 transactionType: transaction.transactionType,
             };
         }));
