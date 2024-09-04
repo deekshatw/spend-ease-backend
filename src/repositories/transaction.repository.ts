@@ -108,6 +108,38 @@ export const getUserTransactionSummaryRepository = async (userId: string): Promi
     }
 };
 
+export const deleteTransactionRepository = async (transactionId: string): Promise<boolean> => {
+    try {
+        const deleted = await TransactionModel.deleteOne({ transactionId });
+        return deleted.deletedCount === 1;
+    } catch (error) {
+        return false;
+    }
+}
+
+export const updateTransactionRepository = async (
+    transactionId: string,
+    updatedTransaction: TransactionInterface
+): Promise<boolean> => {
+    try {
+        console.log(`Updating transaction with ID: ${transactionId}`); // Log the transactionId
+
+        // Update the transaction by its custom transactionId field
+        const result = await TransactionModel.updateOne(
+            { transactionId: transactionId },  // Query by transactionId field
+            { $set: updatedTransaction }        // Use $set to update specific fields
+        );
+
+        console.log(result); // Logs the result object, helpful for debugging
+
+        // Check if the document was modified
+        return result.modifiedCount > 0;  // Returns true if at least one document was modified
+    } catch (error) {
+        console.error('Error updating transaction:', error); // Logs the error message
+        return false;
+    }
+};
+
 
 
 interface FilterOptions {

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserTransactionSummaryRepository = exports.getAllTransactionsOfOneUserRepository = exports.createTransactionRepository = void 0;
+exports.updateTransactionRepository = exports.deleteTransactionRepository = exports.getUserTransactionSummaryRepository = exports.getAllTransactionsOfOneUserRepository = exports.createTransactionRepository = void 0;
 const category_model_1 = __importDefault(require("../database/models/category.model"));
 const counter_service_1 = require("../database/models/helpers/counter.service");
 const transaction_model_1 = __importDefault(require("../database/models/transaction.model"));
@@ -29,7 +29,6 @@ const createTransactionRepository = (transaction) => __awaiter(void 0, void 0, v
             categoryId: transaction.categoryId,
             transactionType: transaction.transactionType
         });
-        console.log(created);
         return created ? 'success' : 'error';
     }
     catch (error) {
@@ -53,9 +52,7 @@ const getAllTransactionsOfOneUserRepository = (userId_1, ...args_1) => __awaiter
         if (filters.type) {
             query.transactionType = filters.type;
         }
-        // Find all transactions based on the query
         const transactions = yield transaction_model_1.default.find(query).sort({ date: -1, createdAt: -1 }).exec();
-        // For each transaction, fetch the associated category
         const result = yield Promise.all(transactions.map((transaction) => __awaiter(void 0, void 0, void 0, function* () {
             const category = yield category_model_1.default.findOne({ categoryId: transaction.categoryId }).exec();
             return {
@@ -64,12 +61,12 @@ const getAllTransactionsOfOneUserRepository = (userId_1, ...args_1) => __awaiter
                 title: transaction.title,
                 description: transaction.description,
                 date: transaction.date,
-                userId: transaction.userId,
+                // userId: transaction.userId,
                 category: category ? {
                     categoryId: category.categoryId,
                     name: category.name,
                     description: category.description
-                } : null, // Handle case where the category is not found
+                } : null,
                 transactionType: transaction.transactionType,
             };
         })));
@@ -83,8 +80,6 @@ const getAllTransactionsOfOneUserRepository = (userId_1, ...args_1) => __awaiter
 exports.getAllTransactionsOfOneUserRepository = getAllTransactionsOfOneUserRepository;
 const getUserTransactionSummaryRepository = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(`Fetching transaction summary for user ID: ${userId}`);
-        // Aggregation pipeline to calculate income, expense, and balance
         const result = yield transaction_model_1.default.aggregate([
             { $match: { userId: userId } },
             {
@@ -111,10 +106,8 @@ const getUserTransactionSummaryRepository = (userId) => __awaiter(void 0, void 0
                 }
             }
         ]);
-        console.log('Aggregation result:', result);
         if (result.length > 0) {
             const summary = result[0];
-            console.log(`Total Income: ${summary.income}, Total Expense: ${summary.expense}, Balance: ${summary.balance}`);
             return summary;
         }
         else {
@@ -122,8 +115,34 @@ const getUserTransactionSummaryRepository = (userId) => __awaiter(void 0, void 0
         }
     }
     catch (error) {
-        console.error('Error fetching transaction summary:', error);
         return { income: 0, expense: 0, balance: 0 };
     }
 });
 exports.getUserTransactionSummaryRepository = getUserTransactionSummaryRepository;
+const deleteTransactionRepository = (transactionId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const deleted = yield transaction_model_1.default.deleteOne({ transactionId });
+        return deleted.deletedCount === 1;
+    }
+    catch (error) {
+        return false;
+    }
+});
+exports.deleteTransactionRepository = deleteTransactionRepository;
+const updateTransactionRepository = (transactionId, updatedTransaction) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        console.log(`Updating transaction with ID: ${transactionId}`); // Log the transactionId
+        // Update the transaction by its custom transactionId field
+        const result = yield transaction_model_1.default.updateOne({ transactionId: transactionId }, // Query by transactionId field
+        { $set: updatedTransaction } // Use $set to update specific fields
+        );
+        console.log(result); // Logs the result object, helpful for debugging
+        // Check if the document was modified
+        return result.modifiedCount > 0; // Returns true if at least one document was modified
+    }
+    catch (error) {
+        console.error('Error updating transaction:', error); // Logs the error message
+        return false;
+    }
+});
+exports.updateTransactionRepository = updateTransactionRepository;
