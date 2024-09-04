@@ -32,7 +32,7 @@ const createCategoryController = (req, res) => __awaiter(void 0, void 0, void 0,
         else {
             res.status(500).json({
                 "success": false,
-                "message": "Internal server error"
+                "message": `Internal server error: ${response}`
             });
         }
     }

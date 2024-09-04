@@ -7,4 +7,6 @@ const transactionRoute = (0, express_1.Router)();
 transactionRoute.post('/create', transaction_controller_1.createTransactionController);
 transactionRoute.get('', auth_middleware_1.authenticateToken, transaction_controller_1.getAllTransactionsOfOneUserController);
 transactionRoute.get('/summary', auth_middleware_1.authenticateToken, transaction_controller_1.getTransactionSummaryController);
+transactionRoute.delete('/delete/:transactionId', auth_middleware_1.authenticateToken, transaction_controller_1.deleteTransactionController);
+transactionRoute.put('/update/:transactionId', auth_middleware_1.authenticateToken, transaction_controller_1.updateTransactionController);
 exports.default = transactionRoute;

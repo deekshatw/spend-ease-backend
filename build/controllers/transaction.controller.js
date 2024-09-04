@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTransactionSummaryController = exports.getAllTransactionsOfOneUserController = exports.createTransactionController = void 0;
+exports.updateTransactionController = exports.deleteTransactionController = exports.getTransactionSummaryController = exports.getAllTransactionsOfOneUserController = exports.createTransactionController = void 0;
 const transaction_repository_1 = require("../repositories/transaction.repository");
 const createTransactionController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const transaction = req.body;
@@ -91,3 +91,66 @@ const getTransactionSummaryController = (req, res) => __awaiter(void 0, void 0, 
     }
 });
 exports.getTransactionSummaryController = getTransactionSummaryController;
+const deleteTransactionController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const transactionId = req.params.transactionId;
+    if (!userId) {
+        res.status(400).json({ success: false, message: "User ID not found" });
+    }
+    try {
+        const response = yield (0, transaction_repository_1.deleteTransactionRepository)(transactionId);
+        if (response) {
+            res.status(200).json({
+                success: true,
+                message: 'Transaction deleted successfully'
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                message: 'An error occurred while deleting transaction'
+            });
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while deleting transaction'
+        });
+    }
+});
+exports.deleteTransactionController = deleteTransactionController;
+const updateTransactionController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const transactionId = req.params.transactionId;
+    const transaction = req.body;
+    if (!userId) {
+        res.status(400).json({ success: false, message: "User ID not found" });
+    }
+    try {
+        const response = yield (0, transaction_repository_1.updateTransactionRepository)(transactionId, transaction);
+        if (response) {
+            res.status(200).json({
+                success: true,
+                message: 'Transaction updated successfully'
+            });
+        }
+        else {
+            res.status(500).json({
+                success: false,
+                message: 'An error occurred while updating transaction'
+            });
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred while updating transaction'
+        });
+    }
+});
+exports.updateTransactionController = updateTransactionController;
