@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getNextTransactionId = exports.getNextCategoryId = exports.getNextUserId = void 0;
+exports.getNextBudgetId = exports.getNextTransactionId = exports.getNextCategoryId = exports.getNextUserId = void 0;
 const category_counter_schema_1 = __importDefault(require("./category_counter.schema"));
 const counter_schema_1 = __importDefault(require("./counter.schema"));
 const transaction_counter_schema_1 = __importDefault(require("./transaction_counter.schema"));
@@ -39,3 +39,12 @@ const getNextTransactionId = () => __awaiter(void 0, void 0, void 0, function* (
     return formattedTransactionId;
 });
 exports.getNextTransactionId = getNextTransactionId;
+const getNextBudgetId = () => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const sequenceDocument = yield transaction_counter_schema_1.default.findByIdAndUpdate({ _id: 'budgetId' }, { $inc: { sequence_value: 1 } }, { new: true, upsert: true });
+    const sequenceValue = (_a = sequenceDocument.sequence_value) !== null && _a !== void 0 ? _a : 1;
+    const formattedBudgetId = `B-${sequenceValue.toString().padStart(2, '0')}`;
+    console.log(formattedBudgetId);
+    return formattedBudgetId;
+});
+exports.getNextBudgetId = getNextBudgetId;
