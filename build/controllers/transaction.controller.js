@@ -149,7 +149,7 @@ const updateTransactionController = (req, res) => __awaiter(void 0, void 0, void
         console.error(error);
         res.status(500).json({
             success: false,
-            message: 'An error occurred while updating transaction'
+            message: error
         });
     }
 });

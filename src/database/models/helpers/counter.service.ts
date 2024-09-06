@@ -34,3 +34,15 @@ export const getNextTransactionId = async (): Promise<string> => {
     console.log(formattedTransactionId);
     return formattedTransactionId;
 };
+
+export const getNextBudgetId = async (): Promise<string> => {
+    const sequenceDocument = await TransactionCounter.findByIdAndUpdate(
+        { _id: 'budgetId' },
+        { $inc: { sequence_value: 1 } },
+        { new: true, upsert: true }
+    );
+    const sequenceValue = sequenceDocument.sequence_value ?? 1;
+    const formattedBudgetId = `B-${sequenceValue.toString().padStart(2, '0')}`;
+    console.log(formattedBudgetId);
+    return formattedBudgetId;
+};
