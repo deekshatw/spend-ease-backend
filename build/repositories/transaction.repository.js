@@ -13,11 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTransactionRepository = exports.deleteTransactionRepository = exports.getUserTransactionSummaryRepository = exports.getAllTransactionsOfOneUserRepository = exports.createTransactionRepository = void 0;
+const budget_model_1 = __importDefault(require("../database/models/budget.model"));
 const category_model_1 = __importDefault(require("../database/models/category.model"));
 const counter_service_1 = require("../database/models/helpers/counter.service");
 const transaction_model_1 = __importDefault(require("../database/models/transaction.model"));
 const createTransactionRepository = (transaction) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // Create new transaction
         const transactionId = yield (0, counter_service_1.getNextTransactionId)();
         const created = yield transaction_model_1.default.create({
             transactionId: transactionId,
@@ -29,6 +31,22 @@ const createTransactionRepository = (transaction) => __awaiter(void 0, void 0, v
             categoryId: transaction.categoryId,
             transactionType: transaction.transactionType
         });
+        if (transaction.transactionType === 'expense') {
+            const budget = yield budget_model_1.default.findOne({
+                userId: transaction.userId,
+                category: transaction.categoryId,
+                startDate: { $lte: transaction.date },
+                endDate: { $gte: transaction.date }
+            }).exec();
+            if (budget) {
+                budget.spent += transaction.amount;
+                yield budget.save();
+                console.log('Budget updated');
+            }
+            else {
+                console.log('No valid budget found for this expense.');
+            }
+        }
         return created ? 'success' : 'error';
     }
     catch (error) {

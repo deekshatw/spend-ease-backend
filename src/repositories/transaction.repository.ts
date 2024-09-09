@@ -1,9 +1,13 @@
 import { TransactionInterface } from "../database/interfaces/transaction.interface";
+import BudgetModel from "../database/models/budget.model";
 import CategoryModel from "../database/models/category.model";
 import { getNextTransactionId } from "../database/models/helpers/counter.service";
 import TransactionModel from "../database/models/transaction.model";
+
+
 export const createTransactionRepository = async (transaction: TransactionInterface): Promise<string> => {
     try {
+        // Create new transaction
         const transactionId = await getNextTransactionId();
         const created = await TransactionModel.create({
             transactionId: transactionId,
@@ -15,12 +19,30 @@ export const createTransactionRepository = async (transaction: TransactionInterf
             categoryId: transaction.categoryId,
             transactionType: transaction.transactionType
         });
+
+        if (transaction.transactionType === 'expense') {
+            const budget = await BudgetModel.findOne({
+                userId: transaction.userId,
+                category: transaction.categoryId,
+                startDate: { $lte: transaction.date },
+                endDate: { $gte: transaction.date }
+            }).exec();
+
+            if (budget) {
+                budget.spent += transaction.amount;
+                await budget.save();
+                console.log('Budget updated');
+            } else {
+                console.log('No valid budget found for this expense.');
+            }
+        }
+
         return created ? 'success' : 'error';
     } catch (error) {
         console.error(error);
         return 'error';
     }
-}
+};
 
 export const getAllTransactionsOfOneUserRepository = async (
     userId: number,
