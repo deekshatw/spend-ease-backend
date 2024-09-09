@@ -38,6 +38,10 @@ const budgetSchema = new mongoose_1.Schema({
         type: Number,
         required: true
     },
+    spent: {
+        type: Number,
+        default: 0,
+    },
     category: {
         type: String,
         required: true
@@ -49,6 +53,15 @@ const budgetSchema = new mongoose_1.Schema({
     endDate: {
         type: Date,
         required: true
+    },
+    notificationsSent: {
+        type: Map,
+        of: Boolean,
+        default: {
+            50: false,
+            75: false,
+            100: false
+        }
     },
     createdAt: {
         type: Date,
