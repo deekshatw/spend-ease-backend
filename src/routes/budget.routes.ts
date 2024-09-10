@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createBudgetController, getAllBudgetsOfOneUserController, updateBudgetController } from "../controllers/budget.controller";
+import { createBudgetController, deleteBudgetController, getAllBudgetsOfOneUserController, updateBudgetController } from "../controllers/budget.controller";
 import { authenticateToken } from "../middlewares/auth.middleware";
 
 const budgetRoute = Router();
