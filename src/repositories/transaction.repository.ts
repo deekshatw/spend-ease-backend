@@ -29,7 +29,7 @@ export const createTransactionRepository = async (transaction: TransactionInterf
             }).exec();
 
             if (budget) {
-                budget.spent += transaction.amount;
+                budget.spent = Number(budget.spent) + Number(transaction.amount); // Ensure both are numbers
                 await budget.save();
                 console.log('Budget updated');
             } else {
